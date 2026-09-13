@@ -63,9 +63,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-35"
-          sdkmanager "build-tools;35.0.0"
+          echo "y" | sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
 
       # ==========================================
@@ -89,13 +87,22 @@ jobs:
 
 
       # ==========================================
-      # 9. Capacitor Copy
+      # 8.1 Debug File Info
       # ==========================================
-      - name: Copy Capacitor Web Assets
+      - name: Debug File Info
+        run: |
+          ls -R android/app/src/main/res/mipmap* || true
+          ls -l android/app/build.gradle || true
+
+
+      # ==========================================
+      # 9. Capacitor Sync
+      # ==========================================
+      - name: Sync Capacitor Plugins
         shell: bash
         run: |
           set -e
-          npx cap copy android
+          npx cap sync android
 
 
       # ==========================================
@@ -123,6 +130,7 @@ jobs:
               repositories {
                   google()
                   mavenCentral()
+                  maven { url 'https://jitpack.io' }
               }
           }
 
@@ -134,8 +142,13 @@ jobs:
               afterEvaluate { project ->
                   if (project.hasProperty("android")) {
                       project.android {
-                          if (namespace == null) {
-                              namespace project.group
+                          if (namespace == null || namespace.isEmpty()) {
+                              def sanitizedName = project.name.replaceAll(/[^a-zA-Z0-9]/, ".")
+                              namespace "com.bnb.app.${sanitizedName}"
+                          }
+                          compileSdk 35
+                          defaultConfig {
+                              targetSdk 35
                           }
                       }
                   }
@@ -370,6 +383,7 @@ jobs:
 
           ./gradlew clean bundleRelease \
             --no-daemon \
+            --no-build-cache \
             --stacktrace \
             --info \
             --console=plain
