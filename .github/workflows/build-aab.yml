@@ -371,6 +371,7 @@ jobs:
           ./gradlew clean bundleRelease \
             --no-daemon \
             --stacktrace \
+            --info \
             --console=plain
 
 
