@@ -363,12 +363,12 @@ jobs:
 
           echo "======================================"
           echo "BUILDING RELEASE AAB"
-          echo "Android SDK: 36"
+          echo "Android SDK: 35"
           echo "Version Code: 3"
           echo "Version Name: 3.0"
           echo "======================================"
 
-          ./gradlew bundleRelease \
+          ./gradlew clean bundleRelease \
             --no-daemon \
             --stacktrace \
             --info
