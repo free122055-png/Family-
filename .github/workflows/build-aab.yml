@@ -371,7 +371,21 @@ jobs:
           ./gradlew clean bundleRelease \
             --no-daemon \
             --stacktrace \
-            --info
+            --console=plain
+
+
+      # ==========================================
+      # 15.1 Dump Gradle Logs on Failure
+      # ==========================================
+      - name: Dump Gradle Logs on Failure
+        if: failure()
+        working-directory: android
+        run: |
+          echo "=== GRADLE BUILD FAILED ==="
+          if [ -f "app/build/reports/problems/problems.html" ]; then
+            echo "Problems report found"
+          fi
+          find . -name "*.log" -print -exec cat {} \;
 
 
       # ==========================================
